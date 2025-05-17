@@ -61,3 +61,32 @@ def add_flashcard():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+from transformers import pipeline
+
+classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+
+def classify_subject_ml(text):
+    candidate_labels = ["Physics", "Chemistry", "Biology", "Mathematics", "History", "Computer Science"]
+    result = classifier(text, candidate_labels)
+    return result['labels'][0]
+
+
+
+
+    @app.route('/flashcards', methods=['GET'])
+def get_flashcards():
+    student_id = request.args.get('student_id')
+    subject = request.args.get('subject')
+    
+    filtered = [fc for fc in flashcards if fc['student_id'] == student_id]
+    if subject:
+        filtered = [fc for fc in filtered if fc['subject'].lower() == subject.lower()]
+    
+    return jsonify(filtered), 200
+
+
+
+    
+
